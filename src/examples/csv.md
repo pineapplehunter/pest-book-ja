@@ -1,4 +1,4 @@
-# Example: CSV
+# 例: CSV
 
 Comma-Separated Values is a very simple text format. CSV files consist of a
 list of *records*, each on a separate line. Each record is a list of *fields*

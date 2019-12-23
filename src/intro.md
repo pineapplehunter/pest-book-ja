@@ -1,17 +1,15 @@
-# Introduction
+# イントロダクション
 
-*Speed or simplicity? Why not __both__?*
+*速度を取るか単純さを取るか? **どちらも**取ってみては？*
 
-`pest` is a library for writing plain-text parsers in Rust.
+`pest`はテキストをパースするためのRustで実装されたライブラリです。
 
-Parsers that use `pest` are **easy to design and maintain** due to the use of
-[Parsing Expression Grammars], or *PEGs*. And, because of Rust's zero-cost
-abstractions, `pest` parsers can be **very fast**.
+`pest`を使ったパーサは[Parsing Expression Grammars]、もしくは*PEGs*を使用することにより、**簡単にデザインすることができ、メンテナンスすることができます。**
+そして、Rustのゼロコスト抽象化により、`pest`で書かれたパーサはとても早く動作します。
 
-## Sample
+## サンプル
 
-Here is the complete grammar for a simple calculator [developed in a (currently
-unwritten) later chapter](examples/calculator.html):
+ここに書いてあるのは、[このあとの章で作成する（まだ書き途中です）](examples/calculator.html)単純な計算機のgrammerです。
 
 ```pest
 num = @{ int ~ ("." ~ ASCII_DIGIT*)? ~ (^"e" ~ int)? }
@@ -32,7 +30,7 @@ calculation = _{ SOI ~ expr ~ EOI }
 WHITESPACE = _{ " " | "\t" }
 ```
 
-And here is the function that uses that parser to calculate answers:
+そして次に書かれているのが先程のパーサを利用して実際に計算をする関数です。
 
 ```rust
 lazy_static! {
@@ -68,14 +66,12 @@ fn eval(expression: Pairs<Rule>) -> f64 {
 }
 ```
 
-## About this book
+## この本について
 
-This book provides an overview of `pest` as well as several example parsers.
-For more details of `pest`'s API, check [the documentation].
+この本は`pest`についての概要といくつかのサンプルを書いています。より詳しく`pest`のAPIについて知りたい場合は[ドキュメント]をご覧ください。
 
-Note that `pest` uses some advanced features of the Rust language. For an
-introduction to Rust, consult the [official Rust book].
+`pest`はRustの複雑な機能を使うので、Rustについて知りたい方は[Rust本（オンライン）]をご覧ください。
 
 [Parsing Expression Grammars]: grammars/peg.html
-[the documentation]: https://docs.rs/pest/
-[official Rust book]: https://doc.rust-lang.org/stable/book/second-edition/
+[ドキュメント]: https://docs.rs/pest/
+[Rust本（オンライン）]: https://doc.rust-lang.org/stable/book/second-edition/
