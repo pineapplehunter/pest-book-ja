@@ -1,5 +1,5 @@
 [book]
-title = "A thoughtful introduction to the pest parser"
+title = "pestパーサ入門"
 description = "An introduction to the pest parser by implementing a Rust grammar subset"
 author = ["Dragoș Tiselice", "高田 勝悟"]
 language = "ja"

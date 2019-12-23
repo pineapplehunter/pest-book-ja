@@ -70,8 +70,8 @@ fn eval(expression: Pairs<Rule>) -> f64 {
 
 この本は`pest`についての概要といくつかのサンプルを書いています。より詳しく`pest`のAPIについて知りたい場合は[ドキュメント]をご覧ください。
 
-`pest`はRustの複雑な機能を使うので、Rustについて知りたい方は[Rust本（オンライン）]をご覧ください。
+`pest`はRustの複雑な機能を使うので、Rustについて知りたい方は[Rust本]（日本語版）をご覧ください。
 
 [Parsing Expression Grammars]: grammars/peg.html
 [ドキュメント]: https://docs.rs/pest/
-[Rust本（オンライン）]: https://doc.rust-lang.org/stable/book/second-edition/
+[Rust本]: https://doc.rust-jp.rs/book/second-edition/

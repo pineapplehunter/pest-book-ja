@@ -1,10 +1,8 @@
 # 例: CSV
 
-Comma-Separated Values is a very simple text format. CSV files consist of a
-list of *records*, each on a separate line. Each record is a list of *fields*
-separated by commas.
+CSV(Comma-Separated Values)はとてもシンプルなフォーマットです。CSVファイルは*レコード*のリストで構成されていて、それぞれのレコードは*フィールド*のカンマ区切りで記されたリストです。
 
-For example, here is a CSV file with numeric fields:
+例として、次の数値データの入ったCSVファイルです。
 
 ```
 65279,1179403647,1463895090
@@ -14,12 +12,11 @@ For example, here is a CSV file with numeric fields:
 65537
 ```
 
-Let's write a program that computes the **sum of these fields** and counts the
-**number of records**.
+それでは、ここから**フィールドの合計値**と**レコードの数**を求めるプログラムを書いていきましょう。
 
-## Setup
+## セットアップ
 
-Start by initializing a new project using [Cargo]:
+まずは[Cargo]をインストールするところから始めましょう:
 
 ```shell
 $ cargo init --bin csv-tool
@@ -27,7 +24,7 @@ $ cargo init --bin csv-tool
 $ cd csv-tool
 ```
 
-Add the `pest` and `pest_derive` crates to the dependencies section in `Cargo.toml`:
+`pest` と `pest_derive` クレートを`Cargo.toml`の`dependencies`セクションに追加してください:
 
 ```toml
 [dependencies]
@@ -35,7 +32,7 @@ pest = "2.0"
 pest_derive = "2.0"
 ```
 
-And finally bring `pest` and `pest_derive` into scope in `src/main.rs`:
+そして、さいごに、`pest` と `pest_derive` を `src/main.rs`のスコープに入れてください:
 
 ```rust
 extern crate pest;
@@ -43,14 +40,12 @@ extern crate pest;
 extern crate pest_derive;
 ```
 
-The `#[macro_use]` attribute is necessary to use `pest` to generate parsing
-code! This is a very important attribute.
+`#[macro_use]`アトリビュートは`pest`がコードを生成するために必要です。とても重要なアトリビュートです。
 
-## Writing the parser
+## パーサを書く
 
-`pest` works by compiling a description of a file format, called a *grammar*,
-into Rust code. Let's write a grammar for a CSV file that contains numbers.
-Create a new file named `src/csv.pest` with a single line:
+`pest`は*grammer*と呼ばれるファイルのフォーマットを記したものをRustにコンパイルすることで使います。 それでは、数値データを含んだCSVのgrammerを書いていきましょう。
+`src/csv.pest`というファイルを作成し、次の1行を記述してください。
 
 ```pest
 field = { (ASCII_DIGIT | "." | "-")+ }
