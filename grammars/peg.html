@@ -1,0 +1,327 @@
+<!DOCTYPE HTML>
+<html lang="ja" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Parsing expression grammars - pestパーサ入門</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An introduction to the pest parser by implementing a Rust grammar subset">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded "><a href="../intro.html"><strong aria-hidden="true">1.</strong> イントロダクション</a></li><li><ol class="section"><li class="expanded "><a href="../examples/csv.html"><strong aria-hidden="true">1.1.</strong> 例: CSV</a></li></ol></li><li class="expanded "><a href="../parser_api.html"><strong aria-hidden="true">2.</strong> パーサ API</a></li><li><ol class="section"><li class="expanded "><a href="../examples/ini.html"><strong aria-hidden="true">2.1.</strong> 例: INI</a></li></ol></li><li class="expanded "><a href="../grammars/grammars.html"><strong aria-hidden="true">3.</strong> Grammars</a></li><li><ol class="section"><li class="expanded "><a href="../grammars/peg.html" class="active"><strong aria-hidden="true">3.1.</strong> Parsing expression grammars</a></li><li class="expanded "><a href="../grammars/syntax.html"><strong aria-hidden="true">3.2.</strong> pestパーサのシンタックス</a></li><li class="expanded "><a href="../grammars/built-ins.html"><strong aria-hidden="true">3.3.</strong> ビルトインルール</a></li><li class="expanded "><a href="../examples/json.html"><strong aria-hidden="true">3.4.</strong> 例: JSON</a></li><li class="expanded "><a href="../examples/jlang.html"><strong aria-hidden="true">3.5.</strong> 例: The J language</a></li></ol></li><li class="expanded "><a href="../precedence.html"><strong aria-hidden="true">4.</strong> Operator precedence (WIP)</a></li><li><ol class="section"><li class="expanded "><a href="../examples/calculator.html"><strong aria-hidden="true">4.1.</strong> Example: Calculator (WIP)</a></li></ol></li><li class="expanded "><a href="../examples/awk.html"><strong aria-hidden="true">5.</strong> Final project: Awk clone (WIP)</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">pestパーサ入門</h1>
+
+                        <div class="right-buttons">
+                            <a href="../print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#parsing-expression-grammar" id="parsing-expression-grammar">Parsing expression grammar</a></h1>
+<p>Parsing expression grammars (PEGs) are simply a strict representation of the
+simple imperative code that you would write if you were writing a parser by
+hand.</p>
+<pre><code class="language-pest">number = {            // To recognize a number...
+    ASCII_DIGIT+      //   take as many ASCII digits as possible (at least one).
+}
+expression = {        // To recognize an expression...
+    number            //   first try to take a number...
+    | &quot;true&quot;          //   or, if that fails, the string &quot;true&quot;.
+}
+</code></pre>
+<p>In fact, <code>pest</code> produces code that is quite similar to the pseudo-code in the
+comments above.</p>
+<h2><a class="header" href="#eagerness" id="eagerness">Eagerness</a></h2>
+<p>When a <a href="syntax.html#repetition">repetition</a> PEG expression is run on an input string,</p>
+<pre><code class="language-pest">ASCII_DIGIT+      // one or more characters from '0' to '9'
+</code></pre>
+<p>it runs that expression as many times as it can (matching &quot;eagerly&quot;, or
+&quot;greedily&quot;). It either succeeds, consuming whatever it matched and passing the
+remaining input on to the next step in the parser,</p>
+<pre><code>&quot;42 boxes&quot;
+ ^ Running ASCII_DIGIT+
+
+&quot;42 boxes&quot;
+   ^ Successfully took one or more digits!
+
+&quot; boxes&quot;
+ ^ Remaining unparsed input.
+</code></pre>
+<p>or fails, consuming nothing.</p>
+<pre><code>&quot;galumphing&quot;
+ ^ Running ASCII_DIGIT+
+   Failed to take one or more digits!
+
+&quot;galumphing&quot;
+ ^ Remaining unparsed input (everything).
+</code></pre>
+<p>If an expression fails to match, the failure propagates upwards, eventually
+leading to a failed parse, unless the failure is &quot;caught&quot; somewhere in the
+grammar. The <em>choice operator</em> is one way to &quot;catch&quot; such failures.</p>
+<h2><a class="header" href="#ordered-choice" id="ordered-choice">Ordered choice</a></h2>
+<p>The <a href="syntax.html#ordered-choice">choice operator</a>, written as a vertical line <code>|</code>, is <em>ordered</em>. The PEG
+expression <code>first | second</code> means &quot;try <code>first</code>; but if it fails, try <code>second</code>
+instead&quot;.</p>
+<p>In many cases, the ordering does not matter. For instance, <code>&quot;true&quot; | &quot;false&quot;</code>
+will match either the string <code>&quot;true&quot;</code> or the string <code>&quot;false&quot;</code> (and fail if
+neither occurs).</p>
+<p>However, sometimes the ordering <em>does</em> matter. Consider the PEG expression <code>&quot;a&quot; | &quot;ab&quot;</code>. You might expect it to match either the string <code>&quot;a&quot;</code> or the string
+<code>&quot;ab&quot;</code>. But it will not — the expression means &quot;try <code>&quot;a&quot;</code>; but if it
+fails, try <code>&quot;ab&quot;</code> instead&quot;. If you are matching on the string <code>&quot;abc&quot;</code>, &quot;try
+<code>&quot;a&quot;</code>&quot; will <em>not</em> fail; it will instead match <code>&quot;a&quot;</code> successfully, leaving
+<code>&quot;bc&quot;</code> unparsed!</p>
+<p>In general, when writing a parser with choices, put the longest or most
+specific choice first, and the shortest or most general choice last.</p>
+<h2><a class="header" href="#non-backtracking" id="non-backtracking">Non-backtracking</a></h2>
+<p>During parsing, a PEG expression either succeeds or fails. If it succeeds, the
+next step is performed as usual. But if it fails, the whole expression fails.
+The engine will not back up and try again.</p>
+<p>Consider this grammar, matching on the string <code>&quot;frumious&quot;</code>:</p>
+<pre><code class="language-pest">word = {     // to recognize a word...
+    ANY*     //   take any character, zero or more times...
+    ~ ANY    //   followed by any character
+}
+</code></pre>
+<p>You might expect this rule to parse any input string that contains at least one
+character (equivalent to <code>ANY+</code>). But it will not. Instead, the first <code>ANY*</code>
+will eagerly eat the entire string — it will <em>succeed</em>. Then, the next
+<code>ANY</code> will have nothing left, so it will fail.</p>
+<pre><code>&quot;frumious&quot;
+ ^ (word)
+
+&quot;frumious&quot;
+         ^ (ANY*) Success! Continue to `ANY` with remaining input &quot;&quot;.
+
+&quot;&quot;
+ ^ (ANY) Failure! Expected one character, but found end of string.
+</code></pre>
+<p>In a system with backtracking (like regular expressions), you would back up one
+step, &quot;un-eating&quot; a character, and then try again. But PEGs do not do this. In
+the rule <code>first ~ second</code>, once <code>first</code> parses successfully, it has consumed
+some characters that will never come back. <code>second</code> can only run on the input
+that <code>first</code> did not consume.</p>
+<h2><a class="header" href="#unambiguous" id="unambiguous">Unambiguous</a></h2>
+<p>These rules form an elegant and simple system. Every PEG rule is run on the
+remainder of the input string, consuming as much input as necessary. Once a
+rule is done, the rest of the input is passed on to the rest of the parser.</p>
+<p>For instance, the expression <code>ASCII_DIGIT+</code>, &quot;one or more digits&quot;, will always
+match the largest sequence of consecutive digits possible. There is no danger
+of accidentally having a later rule back up and steal some digits in an
+unintuitive and nonlocal way.</p>
+<p>This contrasts with other parsing tools, such as regular expressions and CFGs,
+where the results of a rule often depend on code some distance away. Indeed,
+the famous &quot;shift/reduce conflict&quot; in LR parsers is not a problem in PEGs.</p>
+<h1><a class="header" href="#dont-panic" id="dont-panic">Don't panic</a></h1>
+<p>This all might be a bit counterintuitive at first. But as you can see, the
+basic logic is very easy and straightforward. You can trivially step through
+the execution of any PEG expression.</p>
+<ul>
+<li>Try this.</li>
+<li>If it succeeds, try the next thing.</li>
+<li>Otherwise, try the other thing.</li>
+</ul>
+<pre><code>(this ~ next_thing) | (other_thing)
+</code></pre>
+<p>These rules together make PEGs very pleasant tools for writing a parser.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../grammars/grammars.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../grammars/syntax.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="../grammars/grammars.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="../grammars/syntax.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+        <script type="text/javascript" src="../highlight-pest.js"></script>
+        
+
+        
+
+    </body>
+</html>
